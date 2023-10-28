@@ -46,9 +46,10 @@ func (suite *ServerTestSuite) SetupSuite() {
 	var err error
 	// open database
 	suite.Settings = config.NewSettings()
-	suite.DataClient, err = data.Open(fmt.Sprintf("sqlite://%s/data.db", suite.T().TempDir()), "")
+	path := "/Users/jasonzhi/Desktop/Project/Go/reference/recommend/gorse/data"
+	suite.DataClient, err = data.Open(fmt.Sprintf("sqlite://%s/data.db", path), "gorse_")
 	suite.NoError(err)
-	suite.CacheClient, err = cache.Open(fmt.Sprintf("sqlite://%s/cache.db", suite.T().TempDir()), "")
+	suite.CacheClient, err = cache.Open(fmt.Sprintf("sqlite://%s/cache.db", path), "gorse_")
 	suite.NoError(err)
 	// init database
 	err = suite.DataClient.Init()
@@ -1013,6 +1014,7 @@ func (suite *ServerTestSuite) TestTimeSeries() {
 		End()
 }
 
+// 测试：推荐
 func (suite *ServerTestSuite) TestGetRecommends() {
 	ctx := context.Background()
 	t := suite.T()

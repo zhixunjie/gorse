@@ -17,6 +17,7 @@ package data
 import (
 	"context"
 	"encoding/json"
+	"gorm.io/gorm/logger"
 	"reflect"
 	"sort"
 	"strings"
@@ -26,7 +27,6 @@ import (
 	"github.com/juju/errors"
 	"github.com/samber/lo"
 	"github.com/zhenghaoz/gorse/base/jsonutil"
-	"github.com/zhenghaoz/gorse/base/log"
 	"github.com/zhenghaoz/gorse/storage"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -37,8 +37,6 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
-	"moul.io/zapgorm2"
 )
 
 const (
@@ -334,13 +332,14 @@ func Open(path, tablePrefix string) (Database, error) {
 			return nil, errors.Trace(err)
 		}
 		gormConfig := storage.NewGORMConfig(tablePrefix)
-		gormConfig.Logger = &zapgorm2.Logger{
-			ZapLogger:                 log.Logger(),
-			LogLevel:                  logger.Warn,
-			SlowThreshold:             10 * time.Second,
-			SkipCallerLookup:          false,
-			IgnoreRecordNotFoundError: false,
-		}
+		//gormConfig.Logger = &zapgorm2.Logger{
+		//	ZapLogger:                 log.Logger(),
+		//	LogLevel:                  logger.Warn,
+		//	SlowThreshold:             10 * time.Second,
+		//	SkipCallerLookup:          false,
+		//	IgnoreRecordNotFoundError: false,
+		//}
+		gormConfig.Logger = logger.Default.LogMode(logger.Info)
 		database.gormDB, err = gorm.Open(sqlite.Dialector{Conn: database.client}, gormConfig)
 		if err != nil {
 			return nil, errors.Trace(err)

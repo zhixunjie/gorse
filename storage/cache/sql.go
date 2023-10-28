@@ -175,6 +175,7 @@ func (db *SQLDatabase) Init() error {
 		if err != nil {
 			if mysqlErr, ok := err.(*mysql.MySQLError); ok && mysqlErr.Number == 1061 {
 				// ignore duplicate index error
+				err = nil
 			} else {
 				return errors.Trace(err)
 			}
@@ -447,6 +448,11 @@ func (db *SQLDatabase) SearchDocuments(ctx context.Context, collection, subset s
 	} else {
 		tx = tx.Limit(math.MaxInt64)
 	}
+	/**
+	SELECT id, score, categories, timestamp FROM `gorse_documents`
+	WHERE collection = ? and subset = ? and is_hidden = false and JSON_CONTAINS(categories,?)
+	ORDER BY score desc LIMIT 100
+	*/
 	rows, err := tx.Rows()
 	if err != nil {
 		return nil, errors.Trace(err)
